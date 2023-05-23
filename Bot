@@ -1,0 +1,76 @@
+import requests
+
+def share_posts(source_pages, access_token, page_id):
+
+    for source_page in source_pages:
+
+        source_page_id = source_page['id']
+
+        url = f"https://graph.facebook.com/{source_page_id}/feed?fields=message,permalink_url"
+
+        params = {
+
+            "access_token": access_token,
+
+            "limit": 1
+
+        }
+
+        response = requests.get(url, params=params).json()
+
+        
+
+        if 'data' in response and len(response['data']) > 0:
+
+            post = response['data'][0]
+
+            post_message = post.get('message', '')
+
+            post_url = post.get('permalink_url', '')
+
+            
+
+            if post_url:
+
+                share_url = f"https://graph.facebook.com/{page_id}/feed"
+
+                share_params = {
+
+                    "access_token": access_token,
+
+                    "message": post_message,
+
+                    "link": post_url
+
+                }
+
+                share_response = requests.post(share_url, params=share_params)
+
+                
+
+                if share_response.status_code == 200:
+
+                    print(f"Post from {source_page['name']} shared successfully!")
+
+                else:
+
+                    print(f"Failed to share post from {source_page['name']}.")
+
+# Example usage
+
+source_pages = [
+
+    {"id": "111234341502408", "name": "Page Name 1"},
+
+    {"id": "101239044610104", "name": "Page Name 2"},
+
+    # Add more source pages as needed
+
+]
+
+access_token = "EAAM65RWZBMuIBAGCPUUHj6DXH5ZCYBOgiZCSvlBPiWkp1JqwQLLEOcZAaWuzBALg9kcqx19I1LXIFOJK5AZA30HZBMMWZAFb0fO9oFluvzZAiHh7CrikDtHsVYQZAillMi2xDCTXqHW0eLQJ48VUC7cuxAR2PfCdQarqWweWB5gz0xof3w1E8VAelTY3ZBDh09oskL8gz80oHCVTBy3foVqDroZBsVHEbREAQEZD"
+
+page_id = "105681342017235"
+
+share_posts(source_pages, access_token, page_id)
+
